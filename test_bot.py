@@ -1,6 +1,6 @@
 import discord
 import random
-from config import *
+import config
 
 client = discord.Client()
 
