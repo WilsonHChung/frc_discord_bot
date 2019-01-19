@@ -10,22 +10,14 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.startswith('$guess'):
-        await client.send_message(message.channel, 'Guess a number between 1 to 10')
+    # prints out basic team information
+    if message.content.startswith('!watch '):
+        await client.send_message(message.channel, 'Tracking FRC Stats!')
 
-        def guess_check(m):
-            return m.content.isdigit()
-
-        guess = await client.wait_for_message(timeout=5.0, author=message.author, check=guess_check)
-        answer = random.randint(1, 10)
-        if guess is None:
-            fmt = 'Sorry, you took too long. It was {}.'
-            await client.send_message(message.channel, fmt.format(answer))
-            return
-        if int(guess.content) == answer:
-            await client.send_message(message.channel, 'You are right!')
-        else:
-            await client.send_message(message.channel, 'Sorry. It is actually {}.'.format(answer))
+        number = message.content.split(" ")
+        team_number = int(number[1])
+        watch_msg = "Now watching Team " + str(team_number)
+        await client.send_message(message.channel, watch_msg)
 
 
 @client.event
