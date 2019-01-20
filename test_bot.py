@@ -1,7 +1,9 @@
 import discord
 import random
-import config
 from discord.ext import commands
+
+import config
+from tba_utils import *
 
 client = discord.Client()
 
@@ -26,11 +28,23 @@ async def on_message(message):
 
     # prints out basic team information
     if message.content.startswith('!watch '):
-        await client.send_message(message.channel, 'Tracking FRC Stats!')
+        #await client.send_message(message.channel, 'Tracking FRC Stats!')
 
         number = message.content.split(" ")
-        team_number = int(number[1])
-        watch_msg = "Now watching Team " + str(team_number)
+        content = number[1]
+        
+        #this is a team number
+        if content[-1] >= "0" and content[-1] <= "9":
+            if not check_valid_team(int(content)):
+                watch_msg = str(content) + " is not a valid team!"
+            else:
+                watch_msg = "Now watching team " + str(content)
+        #this is an event
+        else:
+            if not check_valid_event(content):
+                watch_msg = str(content) + " is not a valid event!"
+            else:
+                watch_msg = "Now watching event " + str(content)
         await client.send_message(message.channel, watch_msg)
 
     # creates a new role to categorize !watch command users     
