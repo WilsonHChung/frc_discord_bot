@@ -1,15 +1,11 @@
 import discord
 import random
 import config
+from discord import Permissions
 from discord.ext import commands
+from discord.utils import get
 
 client = discord.Client()
-
-# assigns the bot to a role 
-@client.event
-async def member_join(member):
-    role = discord.utils.get(member.server.roles, name='FRC')
-    await client.add_roles(member, role)
 
 @client.event
 async def on_message(message):
@@ -20,9 +16,9 @@ async def on_message(message):
     # displays information about how to use the text 
     if message.content.startswith('!help'):
         await client.send_message(message.channel, 'FRC Discord Commands')
-        help_msg = "watch - displays a robotics team's stats including overall ranking, W/L ratio, and match " + "unwatch - stops displaying stats"
+        help_msg = "watch - displays a robotics team's stats including overall ranking, W/L ratio, and match " \
+                   + "unwatch - stops displaying stats"
         await client.send_message(message.channel, help_msg)
-    
 
     # prints out basic team information
     if message.content.startswith('!watch '):
@@ -33,7 +29,9 @@ async def on_message(message):
         watch_msg = "Now watching Team " + str(team_number)
         await client.send_message(message.channel, watch_msg)
 
-    # creates a new role to categorize !watch command users     
+        # assigns member to a new role to categorize !watch command users
+        role = await client.create_role(message.server, name=str(team_number)+"_role", permissions=Permissions.all())
+        await client.add_roles(message.author, role)
 
 
 @client.event
@@ -42,5 +40,6 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
+    print(discord.version_info)
 
 client.run(config.DISCORD_TOKEN)
