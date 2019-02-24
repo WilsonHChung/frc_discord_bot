@@ -33,6 +33,8 @@ async def on_message(message):
         role = await client.create_role(message.server, name=str(team_number)+"_role", permissions=Permissions.all())
         await client.add_roles(message.author, role)
 
+    if message.content.startswith('!unwatch'):
+        await client.send_message(message.channel, 'Stopped Tracking FRC Stats')
 
 @client.event
 async def on_ready():
