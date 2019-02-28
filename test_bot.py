@@ -7,9 +7,12 @@ from discord.utils import get
 
 client = discord.Client()
 
+# used to keep track of what teams the user is watching
+role_names = []
+
 @client.event
 async def on_message(message):
-    # we do not want the bot to reply to itself
+    # prevents bot to responding to itself
     if message.author == client.user:
         return
 
@@ -32,9 +35,16 @@ async def on_message(message):
         # assigns member to a new role to categorize !watch command users
         role = await client.create_role(message.server, name=str(team_number)+"_role", permissions=Permissions.all())
         await client.add_roles(message.author, role)
+        role_names.append(str(team_number)+"_role")
 
-    if message.content.startswith('!unwatch'):
+    if message.content.startswith('!unwatchall'):
         await client.send_message(message.channel, 'Stopped Tracking FRC Stats')
+        for i in role_names:
+            # await client.remove_role(message.author, i)
+            await client.send_message(message.channel, 'Unfollowed')
+            # print(i)
+
+        
 
 @client.event
 async def on_ready():
