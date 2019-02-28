@@ -10,6 +10,9 @@ client = discord.Client()
 # used to keep track of what teams the user is watching
 role_names = []
 
+# keeps track of team numbers
+teams = []
+
 @client.event
 async def on_message(message):
     # prevents bot to responding to itself
@@ -40,11 +43,9 @@ async def on_message(message):
     if message.content.startswith('!unwatchall'):
         await client.send_message(message.channel, 'Stopped Tracking FRC Stats')
         for i in role_names:
-            # await client.remove_role(message.author, i)
-            await client.send_message(message.channel, 'Unfollowed')
-            # print(i)
-
-        
+            role = discord.utils.get(message.server.roles, name=i)
+            await client.delete_role(message.server, role)
+        await client.send_message(message.channel, 'All teams are now unwatched.')
 
 @client.event
 async def on_ready():
