@@ -40,8 +40,23 @@ async def on_message(message):
         await client.add_roles(message.author, role)
         role_names.append(str(team_number)+"_role")
 
-    if message.content.startswith('!unwatchall'):
+    # removes user from a role from watching their specified team
+    if message.content.startswith('!unwatch '):
         await client.send_message(message.channel, 'Stopped Tracking FRC Stats')
+
+        number = message.content.split(" ")
+        team_number = int(number[1])
+        watch_msg = "Now unwatching Team " + str(team_number)
+        await client.send_message(message.channel, watch_msg)
+        for i in role_names:
+            if i == str(team_number)+"_role":
+                role = discord.utils.get(message.server.roles, name=i)
+                await client.delete_role(message.server, role)        
+
+    # removes user from all roles watching their assigned teams 
+    if message.content.startswith('!unwatchall'):
+        await client.send_message(message.channel, 'Stopped Tracking All FRC Stats')
+        
         for i in role_names:
             role = discord.utils.get(message.server.roles, name=i)
             await client.delete_role(message.server, role)
