@@ -19,9 +19,15 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    # displays information of what the bot is
+    if message.content.startswith('!info'):
+        await client.send_message(message.channel, 'FRC Discord Bot Info')
+        info_msg = "Tracks FRC team information during regionals from thebluealliance.com"
+        await client.send_message(message.channel, info_msg)
+
     # displays information about how to use the text 
     if message.content.startswith('!help'):
-        await client.send_message(message.channel, 'FRC Discord Commands')
+        await client.send_message(message.channel, 'FRC Discord Bot Commands')
         help_msg = "watch - displays a robotics team's stats including overall ranking, W/L ratio, and match " \
                    + "unwatch - stops displaying stats"
         await client.send_message(message.channel, help_msg)
@@ -48,6 +54,7 @@ async def on_message(message):
         team_number = int(number[1])
         watch_msg = "Now unwatching Team " + str(team_number)
         await client.send_message(message.channel, watch_msg)
+
         for i in role_names:
             if i == str(team_number)+"_role":
                 role = discord.utils.get(message.server.roles, name=i)
