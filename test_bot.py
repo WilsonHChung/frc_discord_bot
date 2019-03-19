@@ -6,7 +6,7 @@ from discord.ext import commands
 from discord.utils import get
 
 bot = commands.Bot(command_prefix="!")
-#remove default elp command
+#remove default help command
 bot.remove_command("help")
 
 # used to keep track of what teams the user is watching
