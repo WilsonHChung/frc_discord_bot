@@ -5,7 +5,9 @@ from discord import Permissions
 from discord.ext import commands
 from discord.utils import get
 
-bot = commands.Bot("!")
+bot = commands.Bot(command_prefix="!")
+#remove default elp command
+bot.remove_command("help")
 
 # used to keep track of what teams the user is watching
 role_names = []
@@ -13,61 +15,57 @@ role_names = []
 # keeps track of team numbers
 teams = []
 
-@bot.event
-async def on_message(message):
-    # prevents bot to responding to itself
-    if message.author == bot.user:
-        return
+@bot.command()
+async def info(ctx):
+    await ctx.send('FRC Discord Bot Info')
+    info_msg = "Tracks FRC team information during regionals from thebluealliance.com"
+    await ctx.send(info_msg)
 
-    # displays information of what the bot is
-    if message.content.startswith('!info'):
-        await bot.send_message(message.channel, 'FRC Discord Bot Info')
-        info_msg = "Tracks FRC team information during regionals from thebluealliance.com"
-        await bot.send_message(message.channel, info_msg)
+@bot.command()
+async def help(ctx):
+    await ctx.send('FRC Discord Bot Commands')
+    help_msg = "watch - displays a robotics team's stats including overall ranking, W/L ratio, and match " \
+               + "unwatch - stops displaying stats"
+    await ctx.send(help_msg)
 
-    # displays information about how to use the text 
-    if message.content.startswith('!help'):
-        await bot.send_message(message.channel, 'FRC Discord Bot Commands')
-        help_msg = "watch - displays a robotics team's stats including overall ranking, W/L ratio, and match " \
-                   + "unwatch - stops displaying stats"
-        await bot.send_message(message.channel, help_msg)
+@bot.command()
+async def watch(ctx, arg):
+    await ctx.send('Tracking FRC Stats!')
 
-    # prints out basic team information
-    if message.content.startswith('!watch '):
-        await bot.send_message(message.channel, 'Tracking FRC Stats!')
+    team_number = arg
+    watch_msg = "Now watching Team " + str(team_number)
+    await ctx.send(watch_msg)
 
-        number = message.content.split(" ")
-        team_number = int(number[1])
-        watch_msg = "Now watching Team " + str(team_number)
-        await bot.send_message(message.channel, watch_msg)
+    # assigns member to a new role to categorize !watch command users
+    role = await ctx.guild.create_role(name=str(team_number)+"_role")
+    await ctx.message.author.add_roles(role)
+    role_names.append(str(team_number)+"_role")
 
-        # assigns member to a new role to categorize !watch command users
-        role = await bot.create_role(message.server, name=str(team_number)+"_role", permissions=Permissions.all())
-        await bot.add_roles(message.author, role)
-        role_names.append(str(team_number)+"_role")
+@bot.command()
+async def unwatch(ctx, arg):
+    await ctx.send('Stopped Tracking FRC Stats')
 
-    # removes user from a role from watching their specified team
-    if message.content.startswith('!unwatch '):
-        await bot.send_message(message.channel, 'Stopped Tracking FRC Stats')
+    team_number = arg
+    watch_msg = "Now unwatching Team " + str(team_number)
+    await ctx.send(watch_msg)
 
-        number = message.content.split(" ")
-        team_number = int(number[1])
-        watch_msg = "Now unwatching Team " + str(team_number)
-        await bot.send_message(message.channel, watch_msg)
+    for i in role_names:
+        if i == str(team_number)+"_role":
+            role = discord.utils.get(ctx.message.guild.roles, name=i)
+            print(role)
+            if role:
+                await role.delete()
 
-        for i in role_names:
-            if i == str(team_number)+"_role":
-                role = discord.utils.get(message.server.roles, name=i)
-                await bot.delete_role(message.server, role)        
-
-    # removes user from all roles watching their assigned teams 
-    if message.content.startswith('!unwatchall'):
-        await bot.send_message(message.channel, 'Stopped Tracking All FRC Stats')
+@bot.command()
+async def unwatchall(ctx):
+    await ctx.send('Stopped Tracking All FRC Stats')
         
-        for i in role_names:
-            role = discord.utils.get(message.server.roles, name=i)
-            await bot.delete_role(message.server, role)
-        await bot.send_message(message.channel, 'All teams are now unwatched.')
+    for i in role_names:
+        role = discord.utils.get(ctx.message.guild.roles, name=i)
+        print(role)
+        if role:
+            await role.delete()
+    await ctx.send('All teams are now unwatched.')
 
 @bot.event
 async def on_ready():
